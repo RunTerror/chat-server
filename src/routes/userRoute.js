@@ -1,8 +1,11 @@
 const express=require('express');
 const { signUp, sendVerification, verification, signin , post} = require('../controllers/userController');
 const multer=require('multer');
-
 const userRouter=express.Router();
+const {SESSION_SECRET}=process.env;
+userRouter.use({session: SESSION_SECRET});
+
+
 const storage=multer.diskStorage({
     destination:function (req, file, cb){
         cb(null, 'uploads');
