@@ -1,24 +1,33 @@
 const bcrypt = require('bcrypt');
+require('dotenv').config();
 const jwt = require('jsonwebtoken');
 const usermodel = require('../models/usermodel.js');
-const { hashing, generateRandomNumber } = require('../logic/func.js'); // Utilize utility functions
+const { hashing } = require('../logic/func.js');
+const secretkey = process.env.SECRET_KEY;
+
+
+
+
 
 const SECRET_KEY = 'chat-api'; // Consider storing in environment variable
 
 const signUp = async (req, res) => {
-  const { number, password, name } = req.body;
-  
+  const { number, name, password } = req.body;
+
+
   try {
     const existingUser = await usermodel.findOne({ phone: number });
-    
     if (existingUser) {
       return res.status(400).json({ message: `User with ${number} already exists` });
     }
-    
+
     const hashedPassword = await hashing(password);
     const newUser = await usermodel.create({ phone: number, password: hashedPassword, name });
-    
+    const token = jwt.sign({ id: newUser._id, name: newUser.name, number: newUser.number }, secretkey);
+
     return res.status(200).json({
+      token: token,
+      user: newUser,
       message: "Navigating to verification screen"
     });
   } catch (error) {
@@ -26,55 +35,68 @@ const signUp = async (req, res) => {
   }
 }
 
-const sendVerification = async (req, res) => {
-  try {
-    const { number } = req.body;
-    const existingUser = await usermodel.findOne({ phone: number });
+// const sendVerification = async (req, res) => {
+//   try {
+//     const { number } = req.body;
+//     const existingUser = await usermodel.findOne({ phone: number });
 
-    if (!existingUser || existingUser.isverified) {
-      return res.status(400).json({ message: "User does not exist or is already verified" });
-    }
+//     if (!existingUser || existingUser.isverified) {
+//       return res.status(400).json({ message: "User does not exist or is already verified" });
+//     }
 
-    const verificationCode = generateRandomNumber(100000, 999999);
-    // ... Send verification message using Twilio ...
+//     // ... Send verification message using Twilio ...
+//     function generateRandomNumber(){
+//       return Math.floor(Math.random()*900000 + 100000);
+//      }
 
-    const token = jwt.sign({ verificationcode: verificationCode, userid: existingUser._id }, SECRET_KEY);
-    return res.status(200).json({
-      user: existingUser,
-      message: "Verification message sent",
-      token: token
-    });
-  } catch (error) {
-    return res.status(400).json({ message: "Error sending verification message" });
-  }
-}
+//      const code=generateRandomNumber();
+//      const sender=process.env.SENDER_NUMBER;
+//      await twilioclient.messages.create({
+//         body: `Verification code for chit chat is ${code}`,
+//         from: '+17622488917',
+//         to: number
+//       }).catch((error)=>{
+//         console.log(error);
+//         return res.json("Cannot send verfication please try after sometime!");
+//       });
 
-const verification = async (req, res) => {
-  const { code } = req.body;
-  let token = req.headers.authorization;
-  token = token.split(" ")[1];
+//     const token = jwt.sign({ verificationcode: code, userid: existingUser._id }, SECRET_KEY);
+//     return res.status(200).json({
+//       user: existingUser,
+//       message: "Verification message sent",
+//       token: token
+//     });
+//   } catch (error) {
+//     return res.status(400).json({ message: "Error sending verification message" });
+//   }
+// }
 
-  try {
-    const User = jwt.verify(token, SECRET_KEY);
-    if (code != User.verificationcode) {
-      return res.status(400).json({ message: "Wrong verification code" });
-    }
+// const verification = async (req, res) => {
+//   const { code } = req.body;
+//   let token = req.headers.authorization;
+//   token = token.split(" ")[1];
 
-    const user = await usermodel.findByIdAndUpdate(
-      User.userid,
-      { isverified: true },
-      { new: true }
-    );
+//   try {
+//     const User = jwt.verify(token, SECRET_KEY);
+//     if (code != User.verificationcode) {
+//       return res.status(400).json({ message: "Wrong verification code" });
+//     }
 
-    const newToken = jwt.sign({ user: user }, SECRET_KEY);
-    return res.status(200).json({
-      user: user,
-      token: newToken
-    });
-  } catch (error) {
-    return res.status(400).json({ message: "Error verifying user" });
-  }
-}
+//     const user = await usermodel.findByIdAndUpdate(
+//       User.userid,
+//       { isverified: true },
+//       { new: true }
+//     );
+
+//     const newToken = jwt.sign({ user: user }, SECRET_KEY);
+//     return res.status(200).json({
+//       user: user,
+//       token: newToken
+//     });
+//   } catch (error) {
+//     return res.status(400).json({ message: "Error verifying user" });
+//   }
+// }
 
 const signin = async (req, res) => {
   const { number, password } = req.body;
@@ -85,11 +107,6 @@ const signin = async (req, res) => {
     if (!existingUser) {
       return res.status(400).json({ message: "User not found" });
     }
-
-    if (!existingUser.isverified) {
-      return res.status(400).json({ message: "User not verified" });
-    }
-
     const isPasswordCorrect = await bcrypt.compare(password, existingUser.password);
 
     if (!isPasswordCorrect) {
@@ -106,4 +123,7 @@ const signin = async (req, res) => {
   }
 }
 
-module.exports = { signUp, sendVerification, verification, signin, post };
+module.exports = {
+  signUp,
+  signin,
+};

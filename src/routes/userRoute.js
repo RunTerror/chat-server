@@ -1,29 +1,12 @@
 const express=require('express');
-const { signUp, sendVerification, verification, signin , post} = require('../controllers/userController');
-const multer=require('multer');
+const { signUp,
+     signin,  
+    sendVerification, verification 
+    } = require('../controllers/userController');
 const userRouter=express.Router();
-const {SESSION_SECRET}=process.env;
-userRouter.use({session: SESSION_SECRET});
 
 
-const storage=multer.diskStorage({
-    destination:function (req, file, cb){
-        cb(null, 'uploads');
-    },
-    filename: function (req, file, cb) {
-        cb(null, Date.now() + '-' + file.originalname);
-    },
-
-});
-
-const upload=multer({storage: storage});
-
-userRouter.post('/signup',signUp);
-userRouter.post('/sendverification', sendVerification);
-userRouter.post('/verification', verification);
-userRouter.post('/signin', signin)
-userRouter.post('/upload/:userId', upload.single('profilepicture'), post);
-
-
+userRouter.post('/signup', signUp);
+userRouter.post('/signin', signin);
 
 module.exports=userRouter;

@@ -19,10 +19,6 @@ const userSchema=mongoose.Schema({
 
         type: String
     },
-    isverified:{
-        type: Boolean,
-        default: false,
-    }
 
 }, {timeStamp: true});
 

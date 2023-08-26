@@ -1,30 +1,29 @@
 const express=require('express');
-const mongoose=require('mongoose');
-const userRouter = require('./routes/userRoute');
+const app=express();
+const mongoose= require('mongoose');
+const PORT = process.env.PORT || 1001;
+require('dotenv').config();
+const userRouter=require('./routes/userRoute');
+const { signUp } = require('./controllers/userController');
 
-
-const app =express();
 
 app.use(express.json());
 
-const PORT=process.env.PORT || 1001;
-
-app.use('/user', userRouter);
-app.use('/', (req,res)=>{
-    try {
-        res.json("This server is created by Abhishek Bansal");
-        
-    } catch (error) {
-        return res.send(error);
-    }
+app.get('/',(req, res)=>{
+    res.json("This is Chit Chat server");
 })
 
-mongoose.connect('mongodb+srv://bansalabhishek7411:AbhiZ12@cluster0.edbgthb.mongodb.net/?retryWrites=true&w=majority').then(()=>{
-    app.listen(PORT, (req,res)=>{
-        console.log("server started at port: "+PORT);
+app.use('/user',userRouter);
 
-    });
-}).catch((error)=>{
-    console.log(error);
+
+mongoose.connect('mongodb+srv://bansalabhishek7411:AbhiZ12@cluster0.edbgthb.mongodb.net/?retryWrites=true&w=majority').then((result) => {
+    app.listen(PORT, (req, res)=>{
+        console.log('server started at: '+ PORT);
+    })
+}).catch((err) => {
+    console.log(err);
+    
 });
 
+
+// express.api=functions.https.onRequest(app); 
