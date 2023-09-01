@@ -27,7 +27,9 @@ const signUp = async (req, res) => {
    var token=jwt.sign({userid: newUser._id, name: newUser.name}, SECRET_KEY);
    return res.status(200).json({
     token: token,
-    user: newUser
+    number: newUser.phone,
+    name: newUser.name,
+    userid: newUser._id
    });
 
    
@@ -116,8 +118,10 @@ const signin = async (req, res) => {
 
     const token = jwt.sign({ user: existingUser }, SECRET_KEY);
     return res.status(200).json({
-      user: existingUser,
-      token: token
+    token: token,
+    number: newUser.phone,
+    name: newUser.name,
+    userid: newUser._id
     });
   } catch (error) {
     return res.status(400).json({ message: "Error signing in" });
