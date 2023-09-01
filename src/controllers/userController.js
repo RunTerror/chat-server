@@ -25,7 +25,7 @@ const signUp = async (req, res) => {
     const newUser = await usermodel.create({ phone: number, password: hashedPassword,name: name });
     const token = jwt.sign({ id: newUser._id, name: newUser.name, number: newUser.number }, secretkey);
 
-    return res.status(200).json({
+   res.status(200).json({
       token: token,
       user: newUser,
       message: "Navigating to verification screen"
