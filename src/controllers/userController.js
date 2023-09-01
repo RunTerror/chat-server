@@ -2,14 +2,13 @@ const bcrypt = require('bcrypt');
 require('dotenv').config();
 const jwt = require('jsonwebtoken');
 const usermodel = require('../models/usermodel.js');
-const { hashing } = require('../logic/func.js');
 const secretkey = process.env.SECRET_KEY;
 
 
 
 
 
-const SECRET_KEY = 'chat-api'; // Consider storing in environment variable
+const SECRET_KEY = 'chat-api'; 
 
 const signUp = async (req, res) => {
   const { number, name, password } = req.body;
@@ -21,15 +20,17 @@ const signUp = async (req, res) => {
       return res.status(400).json({ message: `User with ${number} already exists` });
     }
 
-    const hashedPassword = await hashing(password);
+    const hashedPassword = await bcrypt.hash(password, 10);
     const newUser = await usermodel.create({ phone: number, password: hashedPassword,name: name });
-    const token = jwt.sign({ id: newUser._id, name: newUser.name, number: newUser.number }, secretkey);
+    
+      
+   var token=jwt.sign({userid: newUser._id, name: newUser.name}, SECRET_KEY);
+   return res.status(200).json({
+    token: token,
+    user: newUser
+   });
 
-   res.status(200).json({
-      token: token,
-      user: newUser,
-      message: "Navigating to verification screen"
-    });
+   
   } catch (error) {
     return res.status(400).json({ message: "Error signing up" });
   }
