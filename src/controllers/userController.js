@@ -110,13 +110,12 @@ const signin = async (req, res) => {
       return res.status(400).json({ message: "Incorrect credentials" });
     }
     const token = jwt.sign({ user: existingUser }, SECRET_KEY);
-    console.log(existingUser);
     return res.status(200).json({
-    // token: token,
-    // number: newUser.phone,
-    // name: newUser.name,
-    // userid: newUser._id
-    
+    token: token,
+    number: existingUser.phone,
+    name: existingUser.name,
+    userid: existingUser._id
+
     });
   } catch (error) {
     return res.status(400).json({ message: "Error signing in" });
