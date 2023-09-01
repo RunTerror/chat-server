@@ -24,7 +24,7 @@ const signUp = async (req, res) => {
     const newUser = await usermodel.create({ phone: number, password: hashedPassword,name: name });
     
       
-   return res.status(200).json("Signup successful!");
+   return res.status(200).json( {message: "Signup successful!"});
 
    
   } catch (error) {
