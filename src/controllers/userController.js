@@ -24,13 +24,7 @@ const signUp = async (req, res) => {
     const newUser = await usermodel.create({ phone: number, password: hashedPassword,name: name });
     
       
-   var token=jwt.sign({userid: newUser._id, name: newUser.name}, SECRET_KEY);
-   return res.status(200).json({
-    token: token,
-    number: newUser.phone,
-    name: newUser.name,
-    userid: newUser._id
-   });
+   return res.status(200).json("Signup successful!");
 
    
   } catch (error) {
@@ -106,22 +100,23 @@ const signin = async (req, res) => {
 
   try {
     const existingUser = await usermodel.findOne({ phone: number });
-
+    
     if (!existingUser) {
       return res.status(400).json({ message: "User not found" });
     }
     const isPasswordCorrect = await bcrypt.compare(password, existingUser.password);
-
+    
     if (!isPasswordCorrect) {
       return res.status(400).json({ message: "Incorrect credentials" });
     }
-
     const token = jwt.sign({ user: existingUser }, SECRET_KEY);
+    console.log(existingUser);
     return res.status(200).json({
-    token: token,
-    number: newUser.phone,
-    name: newUser.name,
-    userid: newUser._id
+    // token: token,
+    // number: newUser.phone,
+    // name: newUser.name,
+    // userid: newUser._id
+    
     });
   } catch (error) {
     return res.status(400).json({ message: "Error signing in" });
