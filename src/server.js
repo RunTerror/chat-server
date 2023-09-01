@@ -2,9 +2,7 @@ const express=require('express');
 const app=express();
 const mongoose= require('mongoose');
 const PORT = process.env.PORT || 1001;
-require('dotenv').config();
 const userRouter=require('./routes/userRoute');
-const { signUp } = require('./controllers/userController');
 
 
 app.use(express.json());
@@ -25,5 +23,3 @@ mongoose.connect('mongodb+srv://bansalabhishek7411:AbhiZ12@cluster0.edbgthb.mong
     
 });
 
-
-// express.api=functions.https.onRequest(app); 

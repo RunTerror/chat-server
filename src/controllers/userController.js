@@ -22,7 +22,7 @@ const signUp = async (req, res) => {
     }
 
     const hashedPassword = await hashing(password);
-    const newUser = await usermodel.create({ phone: number, password: hashedPassword, name });
+    const newUser = await usermodel.create({ phone: number, password: hashedPassword,name: name });
     const token = jwt.sign({ id: newUser._id, name: newUser.name, number: newUser.number }, secretkey);
 
     return res.status(200).json({
