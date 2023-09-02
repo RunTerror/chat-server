@@ -17,18 +17,18 @@ const signUp = async (req, res) => {
   try {
     const existingUser = await usermodel.findOne({ phone: number });
     if (existingUser) {
-      return res.status(200).json( `User with ${number} already exists` );
+      return res.status(200).send( `User with ${number} already exists` );
     }
 
     const hashedPassword = await bcrypt.hash(password, 10);
     const newUser = await usermodel.create({ phone: number, password: hashedPassword,name: name });
     
       
-   return res.status(200).json( "Signup successful!");
+   return res.status(200).send( "Signup successful!");
 
    
   } catch (error) {
-    return res.status(400).json("Error signing up" );
+    return res.status(400).send("Error signing up" );
   }
 }
 
@@ -102,12 +102,12 @@ const signin = async (req, res) => {
     const existingUser = await usermodel.findOne({ phone: number });
     
     if (!existingUser) {
-      return res.status(400).json( "User not found" );
+      return res.status(400).send( "User not found" );
     }
     const isPasswordCorrect = await bcrypt.compare(password, existingUser.password);
     
     if (!isPasswordCorrect) {
-      return res.status(400).json( "Incorrect credentials" );
+      return res.status(400).send( "Incorrect credentials" );
     }
     const token = jwt.sign({ user: existingUser }, SECRET_KEY);
     return res.status(200).json({
@@ -118,7 +118,7 @@ const signin = async (req, res) => {
 
     });
   } catch (error) {
-    return res.status(400).json("Error signing in" );
+    return res.status(400).send("Error signing in" );
   }
 }
 
