@@ -21,10 +21,10 @@ const signUp = async (req, res) => {
     }
 
     const hashedPassword = await bcrypt.hash(password, 10);
-    const newUser = await usermodel.create({ phone: number, password: hashedPassword,name: name });
+    await usermodel.create({ phone: number, password: hashedPassword,name: name });
     
       
-   return res.status(200).send( "Signup successful!");
+   return res.status(200).json( "Signup successful!");
 
    
   } catch (error) {
